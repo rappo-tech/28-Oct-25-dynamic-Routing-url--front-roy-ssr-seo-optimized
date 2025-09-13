@@ -10,10 +10,13 @@ datasource db {
 model AllInstaUser {
   id        String    @id @default(uuid())
   createdAt DateTime  @default(now())
+  emailId   String? 
+  image     String? 
+  token     String? 
   userName  String
+  allImgs   AllImgs[]
   allMsgs   AllMsgs[]
   allPosts  AllPost[]
-  allImgs   AllImgs[]
 }
 
 model AllMsgs {
@@ -34,6 +37,7 @@ model AllPost {
   post      String
   user      AllInstaUser @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
 model AllImgs {
   id        String       @id @default(uuid())
   createdAt DateTime     @default(now())

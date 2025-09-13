@@ -7,17 +7,23 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed": "npx tsx prisma/seed.ts"
+    "seed": "npx tsx prisma/seed.ts",
+    "ws": "npx tsx websocket.ts",
+    "email": "npx tsx sendEmail.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",
     "axios": "^1.11.0",
+    "dotenv": "^17.2.2",
     "jose": "^6.1.0",
     "next": "15.5.2",
     "next-auth": "^4.24.11",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "ws": "^8.18.3"
+    "resend": "^6.0.2",
+    "ws": "^8.18.3",
+    "zod": "^4.1.5",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -25,6 +31,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/ws": "^8.18.1",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
     "prisma": "^6.15.0",

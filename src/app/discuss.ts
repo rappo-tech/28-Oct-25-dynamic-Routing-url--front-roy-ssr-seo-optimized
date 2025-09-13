@@ -1,12 +1,9 @@
 /*
-1.chcek  the middleware/api/src....
-2.zerodha websocket logic
-
-
-
-
-
-
-
+signup.tsx
+authOptions.ts
+middlware.ts 
+verifyMobile.tsx
+saveMobilen&user.ts
+premiumPage.tsx
 
 */

@@ -75,5 +75,6 @@ export const config = {
     "/dashboard/:path*",
     "/api/((?!auth).)*",  // This matches /api/* but excludes /api/auth/*
     "/protect/:path*",
+    "/protect2/:path*"
   ],
 };

@@ -26,9 +26,17 @@ export default function HOME() {
 
   return (
     <div>
+
       <Link href={'/vdo'}>
         <button className="bg-pink-900 hover:bg-amber-50">go to vdo</button>
       </Link>
+
+
+  <Link href={'/protect2/geminiFront'}>
+        <button className="bg-teal-400 hover:bg-amber-50">go to WebSocket</button>
+      </Link>
+
+
       <p className="bg-yellow-500">{session?.user?.name}</p>
       <p>id: {session?.user?.id}</p>
       <p>img:{session?.user?.image}</p>
