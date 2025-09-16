@@ -1,17 +1,15 @@
 'use client'
 import { userStateStore } from "@/zustandStore"
-import Link from "next/link"
+export default function UserOne() {
 
-export default  function UserOne() {
-const  {ws,setWs,status,setStatus,userName,
-setUserName,msg,setMsg,sender,setSender,isConnected,
-setIsConnected
+const {ws,setWs,isConnected,setIsConnected,
+msg,setMsg ,status,setStatus,userName,setUserName,
+sender,setSender
 }=userStateStore()
 
-
-//join socket
-const joinws=()=>{
-const socket=new WebSocket('ws://localhost:8080/')
+//join 
+const join=()=>{
+const socket= new WebSocket('ws://localhost:8080')
 
 socket.onopen=()=>{
 setWs(socket)
@@ -19,59 +17,61 @@ socket.send(JSON.stringify({action:"JOIN",userName}))
 setIsConnected(true)
 }
 socket.onmessage=(event)=>{
-const parsedMsg=JSON.parse(event.data) as {type:string,msg:string}
-if(parsedMsg.type==='JOIN'){
-setStatus(parsedMsg.msg)
-}else if(parsedMsg.type==='MSG'){
-setStatus(parsedMsg.msg)
-}
+const parseddata =JSON.parse(event.data) as {type:string,msg:string}
+if(parseddata.type==='JOIN'){
+setStatus(parseddata.msg)
+}else if(parseddata.type==='MSG'){
+setStatus(parseddata.msg)
 }
 socket.onclose=()=>{
-setIsConnected(false)
 setWs(null)
+setIsConnected(false)
+}
 }
 
+
+
+
 }
- 
-//send msg
+
+// send msg 
 const sendMsg=()=>{
 if(!ws) return 
 if(ws.readyState===WebSocket.OPEN){
-ws.send(JSON.stringify({action:"MSG",reciver:sender,userName,msg}))
+ws.send(JSON.stringify({action:"MSG",msg,reciver:sender,userName}))
 }
 }
 
 return (<div>
-<Link href={'/otp'}>
-<button  className="bg-amber-400">go to VerifyMobile</button>
-</Link>
 
-<input 
+<input
 type="text"
-placeholder="enter your userName"
+placeholder="enter userName"
 value={userName}
 onChange={(e)=>setUserName(e.target.value)}
 />
+<button onClick={join}>join </button>
 
-<button onClick={joinws}>join </button>
-<p>{isConnected?'connected':'disconnnected'}</p>
-
-<input 
+<input
 type="text"
-placeholder="enter your reciver..."
+placeholder="enter recivername"
 value={sender}
 onChange={(e)=>setSender(e.target.value)}
 />
-
-<input 
+<input
 type="text"
-placeholder="enter your msg "
+placeholder="enter msg"
 value={msg}
 onChange={(e)=>setMsg(e.target.value)}
 />
 
-<button onClick={sendMsg}>send msg</button>
-<p>status:{status}</p>
+<button onClick={sendMsg}>send msg </button>
+
+<p>{isConnected?"connected":"disconneted"}</p>
+
+<p>status: {status}</p>
+
 
 </div>)
 }
+

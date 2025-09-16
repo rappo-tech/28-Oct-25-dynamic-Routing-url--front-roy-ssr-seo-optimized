@@ -1,54 +1,68 @@
 import { WebSocketServer,WebSocket } from "ws";
-import http from  'http'
-const server= http.createServer()
+import http from 'http'
+const server=http.createServer()
+const allActiveUser :{userName:string,socket:WebSocket}[] =[]
 const wss= new WebSocketServer({server})
-const allRooms :Record<string,Set<WebSocket>> ={}
+
 
 wss.on('connection',(socket:WebSocket)=>{
 
 socket.on('message',(data:string)=>{
-const parsedData=JSON.parse(data) as {action:string,roomName:string,msg?:string}
-const {action,roomName,msg}=parsedData
+const parsedMsg=JSON.parse(data) as {action:string,userName:string,msg?:string,reciver?:string}
+const {action,userName,msg,reciver}=parsedMsg
+
+const joinTheUser=()=>{
+const findUser=allActiveUser.find((x)=>x.userName===userName)
+if(findUser){
+return console.log('that user is alredy existed ')
+}else{
+allActiveUser.push({userName,socket})
+socket.send(JSON.stringify({type:"JOIN",msg:`welcome ${userName} online `}))
+console.log(allActiveUser)
+}
+}
 
 const sendMsg=()=>{
-if(!allRooms[roomName]){
-allRooms[roomName]=new Set()
+const findUser=allActiveUser.find((x)=>x.userName===userName)
+const findReciver=allActiveUser.find((x)=>x.userName===reciver)
+if(!findReciver || !findUser){
+return console.log(`eihetr of them are offline `)
+}else{
+if(findReciver.socket.readyState===WebSocket.OPEN){
+findReciver.socket.send(JSON.stringify({type:"MSG",sender:userName,msg:msg}))
 }
-allRooms[roomName].add(socket)
-allRooms[roomName].forEach((client)=>{
-if(client.readyState===WebSocket.OPEN){
-client.send(JSON.stringify({type:"JOIN",msg:msg}))
 }
-})
+
+
 }
+
+
+
 
 if(action==='JOIN'){
-if(!allRooms[roomName]){
-allRooms[roomName]=new Set()
-}
-allRooms[roomName].add(socket)
-allRooms[roomName].forEach((client)=>{
-if(client.readyState===WebSocket.OPEN){
-client.send(JSON.stringify({type:"MSG",totalNo:allRooms[roomName].size,msg:"someone joind  the rooms "}))
-}
-})
-}
-if(action==='MSG'){
+joinTheUser()
+}else if(action==='MSG'){
 sendMsg()
 }
-})
-socket.on('close',()=>{
-for(const roomName in allRooms){
-allRooms[roomName].delete(socket)
-console.log('websocket   closed !!! ')
-}
-})
+
 
 })
 
+socket.on('close', () => {
+  // remove that socket from active users
+  const index = allActiveUser.findIndex((x) => x.socket === socket);
+  if (index !== -1) {
+    console.log(`${allActiveUser[index].userName} disconnected`);
+    allActiveUser.splice(index, 1);
+  }
+});
+
+
+})
 
 
 
 
 
-server.listen(8080,()=>console.log('websocket server started at port:8080'))
+
+server.listen(8080,()=>console.log('websocketserver started at port 8080'))

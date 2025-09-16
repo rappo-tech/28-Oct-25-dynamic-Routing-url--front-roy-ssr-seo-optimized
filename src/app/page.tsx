@@ -32,9 +32,9 @@ export default function HOME() {
       </Link>
 
 
-  <Link href={'/protect2/geminiFront'}>
+  <Link href={'/protect2/clickPic'}>
         <button className="bg-teal-400 hover:bg-amber-50">go to WebSocket</button>
-      </Link>
+      </Link>cd
 
 
       <p className="bg-yellow-500">{session?.user?.name}</p>
