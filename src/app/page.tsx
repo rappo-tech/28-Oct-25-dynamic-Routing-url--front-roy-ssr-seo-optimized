@@ -33,7 +33,7 @@ export default function HOME() {
 
 
   <Link href={'/protect2/clickPic'}>
-        <button className="bg-teal-400 hover:bg-amber-50">go to WebSocket</button>
+        <button className="bg-teal-400 hover:bg-amber-50">upload the img </button>
       </Link>cd
 
 

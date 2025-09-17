@@ -2,13 +2,16 @@
 
 import { useRef, useState } from "react"
 import Image from "next/image"
+import axios from "axios"
+import { userStateStore } from "@/zustandStore"
+
 
 export default function Click() {
 const vdoStreaming=useRef<MediaStream|null>(null)
 const actualVdo=useRef<HTMLVideoElement|null>(null)
 const imageCanvas=useRef<HTMLCanvasElement|null>(null)
 const [imgUrl,setImgUrl]=useState<string>('')
-
+const {status,setStatus}=userStateStore()
 
 //strat vdo streaming 
 const startVdo=async()=>{
@@ -20,16 +23,29 @@ actualVdo.current.srcObject=camera
 }
 
 //click img 
-const clickImg=()=>{
+const clickImg=async()=>{
 if(!imageCanvas.current ||  !actualVdo.current) return 
 const canvas= imageCanvas.current.getContext('2d')!
 imageCanvas.current.height=actualVdo.current.videoHeight
 imageCanvas.current.width=actualVdo.current.videoWidth
 canvas.drawImage(actualVdo.current,0,0)
-imageCanvas.current.toBlob((blob)=>{
+
+imageCanvas.current.toBlob(async(blob)=>{
 if(blob){
+const formData = new FormData()
+    formData.append('file', blob )
+      const res = await axios.post("/protect/uploadImg", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    if (res.status===201) {
+      console.log('done')
+setStatus('uplaode done sucessfully ')
+    }
 const url=URL.createObjectURL(blob)
 setImgUrl(url)
+
 }
 })
 
@@ -90,6 +106,7 @@ src={imgUrl}
 
 <p className="bg-teal-400" onClick={download}>{imgUrl}</p>
 
+<p>warniing: {status}</p>
 
 </div>)
 }

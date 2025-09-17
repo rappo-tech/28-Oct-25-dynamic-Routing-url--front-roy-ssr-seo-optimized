@@ -1,30 +1,30 @@
 import GoogleProvider from 'next-auth/providers/google'
-import { SignJWT,jwtVerify } from 'jose'
 import { AuthOptions } from 'next-auth'
+import { SignJWT,jwtVerify } from 'jose'
 
 export const authOptions :AuthOptions={
-  providers:[GoogleProvider({
-  clientId: process.env.GOOGLE_CLIENT_ID as string, 
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET as string, 
-  authorization:{
-  params:{
-      prompt: "select_account",      // ✅ Always show Google account chooser
+providers:[GoogleProvider({
+clientId:process.env.GOOGLE_CLIENT_ID as string, 
+clientSecret:process.env.GOOGLE_CLIENT_SECRET as string, 
+authorization:{
+params:{
+          prompt: "select_account",      // ✅ Always show Google account chooser
           access_type: "offline",        // Optional: for refresh token
           response_type: "code",         
-  }
-  }
-  })],
-  callbacks:{
-async  jwt({user,token,account}){
+}
+}
+})],
+callbacks:{
+async jwt({user,token,account}){
 if(user){
 token.sub=user.id;
-token.email=user.email; 
-token.name=user.name;
+token.email=user.email;
+token.name= user.name;
 token.customToken=user.customToken;
 if(account?.provider==='google'){
-token.customToken=await new SignJWT({
-id:token.sub, 
-email:token.email
+token.customToken= await new SignJWT({
+id:token.id,
+email:token.email, 
 })
             .setProtectedHeader({ alg: "HS256" })
             .setExpirationTime("12h")  // ✅ Changed from 1h to 12h
@@ -32,19 +32,16 @@ email:token.email
 }
 }else{
 try{
-if(token.customToken){
 await jwtVerify(
-token.customToken as string  , 
+token.customToken as string, 
 new TextEncoder().encode(process.env.JWT_SECRET)
 )
-}
-
 }catch(error){
-const jwterror=error as {code?:string,message?:string}
-console.log('errr    while jwt $',jwterror)
+const jwtError=error as {code?:string,message?:string}
+console.log('err at jwt ',jwtError)
 token.customToken=await new SignJWT({
-id:token.sub, 
-email:token.email
+id:token.sub,
+email:token.email,
 })
             .setProtectedHeader({ alg: "HS256" })
             .setExpirationTime("24h")
@@ -52,22 +49,20 @@ email:token.email
 }
 }
 return token
-}, 
+},
 async session({session,token}){
 if(session.user){
-session.user.id=token.sub as string; 
-session.user.email=token.email as string;
+session.user.id=token.sub as string;
 session.user.name=token.name as string;
-session.user.customToken=token.customToken as string 
+session.user.email=token.email as string;
+session.user.customToken=token.customToken as string;
 }
 return session
 }
-  }, 
-  session:{strategy:'jwt'}, 
-  secret:process.env.NEXTAUTH_SECRET
+}, 
+session:{strategy:'jwt'},
+secret:process.env.NEXTAUTH_SECRET
 }
-
-
 
 
 
