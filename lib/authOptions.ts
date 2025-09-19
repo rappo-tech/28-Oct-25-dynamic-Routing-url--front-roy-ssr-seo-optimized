@@ -1,10 +1,11 @@
-import GoogleProvider from 'next-auth/providers/google'
+import GoogleProvider  from  'next-auth/providers/google'
 import { AuthOptions } from 'next-auth'
-import { SignJWT,jwtVerify } from 'jose'
+import { jwtVerify,SignJWT } from 'jose'
 
-export const authOptions :AuthOptions={
+
+export const authOptions:AuthOptions={
 providers:[GoogleProvider({
-clientId:process.env.GOOGLE_CLIENT_ID as string, 
+clientId:process.env.GOOGLE_CLIENT_ID as string,
 clientSecret:process.env.GOOGLE_CLIENT_SECRET as string, 
 authorization:{
 params:{
@@ -13,59 +14,55 @@ params:{
           response_type: "code",         
 }
 }
-})],
+})], 
 callbacks:{
 async jwt({user,token,account}){
 if(user){
 token.sub=user.id;
 token.email=user.email;
-token.name= user.name;
+token.name=user.name;
 token.customToken=user.customToken;
 if(account?.provider==='google'){
-token.customToken= await new SignJWT({
+token.customToken=await new SignJWT({
 id:token.id,
-email:token.email, 
-})
+email:token.email
+}) 
             .setProtectedHeader({ alg: "HS256" })
             .setExpirationTime("12h")  // ✅ Changed from 1h to 12h
-            .sign(new TextEncoder().encode(process.env.JWT_SECRET));
+            .sign(new TextEncoder().encode(process.env.JWT_SECRET)); 
 }
 }else{
 try{
-await jwtVerify(
-token.customToken as string, 
+await jwtVerify(token.customToken as string, 
 new TextEncoder().encode(process.env.JWT_SECRET)
 )
 }catch(error){
-const jwtError=error as {code?:string,message?:string}
-console.log('err at jwt ',jwtError)
-token.customToken=await new SignJWT({
-id:token.sub,
-email:token.email,
+const jwterror=error as {code?:string,message?:string}
+console.log(`jwt error ${jwterror}`)
+token.custonToken=await new  SignJWT({
+id:token.id, 
+email:token.email 
 })
             .setProtectedHeader({ alg: "HS256" })
             .setExpirationTime("24h")
             .sign(new TextEncoder().encode(process.env.JWT_SECRET));
 }
 }
-return token
-},
+return token 
+}, 
 async session({session,token}){
 if(session.user){
-session.user.id=token.sub as string;
-session.user.name=token.name as string;
+session.user.id=token.sub as string; 
+session.user.name=token.name as string; 
 session.user.email=token.email as string;
 session.user.customToken=token.customToken as string;
 }
-return session
+return session 
 }
 }, 
-session:{strategy:'jwt'},
+session:{strategy:'jwt'}, 
 secret:process.env.NEXTAUTH_SECRET
 }
-
-
-
 
 
 
