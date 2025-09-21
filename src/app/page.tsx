@@ -32,7 +32,7 @@ export default function HOME() {
       </Link>
 
 
-  <Link href={'/protect2/recordVdo'}>
+  <Link href={'/protect2/userOne'}>
         <button className="bg-teal-400 hover:bg-amber-50">upload the img </button>
       </Link>cd
 

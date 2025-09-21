@@ -1,40 +1,40 @@
 import { jwtVerify } from "jose"
 import { NextRequest, NextResponse } from "next/server"
-export async function middleware(req:NextRequest) {
-console.log('middleware req came')
+export  async function middleware(req:NextRequest) {
 try{
 const token=req.cookies.get('custom-token')?.value ||
-req.headers.get('Authorization')?.replace('Bearer', "")
-console.log(token)
+req.headers.get('Authorization')?.replace("Bearer", '')
+
 if(!token){
 if(req.nextUrl.pathname.startsWith('/api/')){
-return NextResponse.json({error:"token not valid "},{status:404})
+return NextResponse.json({error:"token not found "},{status:404})
+}
+return NextResponse.redirect(new URL('/login',req.url))
 }
 
-return NextResponse.redirect(new URL("/login",req.url))
-}
-const {payload}=await jwtVerify(token as string,
-new TextEncoder().encode(process.env.JWT_SECRET)
+const {payload}=await jwtVerify(token as string, 
+new TextEncoder().encode(process.env.JWT_SECRET as string )
 )
-console.log(payload.email)
-return NextResponse.next()
+console.log(`token verified for ${payload.email}`)
+
+
 }catch(error){
-const jwterror=error as {code?:string,message?:string}
+const jwterror= error as {code?:string,message?:string}
 if(jwterror.code==='ERR_JWT_EXPIRED'){
-console.log('token expired ')
-const response=NextResponse.redirect(new URL('/login',req.url))
+const response=   NextResponse.redirect(new URL('/login',req.url))
 return response
 }
 
 
+
+
 if(req.nextUrl.pathname.startsWith('/api/')){
-return NextResponse.json({error:"token not valid "},{status:404})
+return NextResponse.json({error:"token un-varified"},{status:404})
 }
 
-return NextResponse.redirect(new URL("/login",req.url))
+return NextResponse.redirect(new URL('/login',req.url))
 }
 }
-
 
 
 export const  config={
