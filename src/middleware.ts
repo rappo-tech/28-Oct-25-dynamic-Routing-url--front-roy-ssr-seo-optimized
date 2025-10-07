@@ -1,41 +1,42 @@
 import { jwtVerify } from "jose"
 import { NextRequest, NextResponse } from "next/server"
-export  async function middleware(req:NextRequest) {
-try{
-const token=req.cookies.get('custom-token')?.value ||
-req.headers.get('Authorization')?.replace("Bearer", '')
+
+export async function middleware(req:NextRequest) {
+    try{
+const token=req.cookies.get('custom-token')?.value||
+req.headers.get('Authorization')?.replace("Bearer",'')
 
 if(!token){
-if(req.nextUrl.pathname.startsWith('/api/')){
-return NextResponse.json({error:"token not found "},{status:404})
-}
-return NextResponse.redirect(new URL('/login',req.url))
+   if(req.nextUrl.pathname.startsWith('/api/')){
+return NextResponse.json({error:'token not found '},{status:403})
 }
 
-const {payload}=await jwtVerify(token as string, 
-new TextEncoder().encode(process.env.JWT_SECRET as string )
-)
-console.log(`token verified for ${payload.email}`)
 
+return NextResponse.redirect( new URL('/login',req.url)) 
+}
 
-}catch(error){
-const jwterror= error as {code?:string,message?:string}
-if(jwterror.code==='ERR_JWT_EXPIRED'){
-const response=   NextResponse.redirect(new URL('/login',req.url))
+const {payload}=await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET))
+console.log(`token veriefy  for this email :- ${payload.email}`)
+return NextResponse.next()
+    }catch(error){
+const  jwtError=error as {code?:string,message?:string}
+if(jwtError.code==='ERR_JWT_EXPIRED'){
+const response=NextResponse.redirect( new URL('/login',req.url))
+response.cookies.delete('custom-token')
 return response
 }
 
 
 
-
 if(req.nextUrl.pathname.startsWith('/api/')){
-return NextResponse.json({error:"token un-varified"},{status:404})
+return NextResponse.json({error:'un-auth token'},{status:403})
 }
 
-return NextResponse.redirect(new URL('/login',req.url))
-}
-}
 
+return NextResponse.redirect( new URL('/login',req.url))
+
+    }
+}
 
 export const  config={
 matcher:[

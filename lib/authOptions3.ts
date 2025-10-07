@@ -11,7 +11,7 @@ export const authOptions: AuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
       authorization: {
         params: {
-          prompt: "select_account",      // ✅ Always show Google account chooser
+          prompt: "select_account consent",// ✅ Always show Google account chooser with consent
           access_type: "offline",        // Optional: for refresh token
           response_type: "code",         // Recommended for OAuth 2.0
         },

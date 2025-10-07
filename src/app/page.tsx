@@ -1,5 +1,23 @@
 'use client'
 import Link from "next/link"
+
+export default  function Home() { 
+
+return (<div>
+
+<p className="bg-amber-500 pt20 pb-20 pl-20 pr20 ">welcome to landing page </p>
+
+<Link href={'/login'}>
+<button className="bg-red-700 hover:bg-red-400">get started </button>
+</Link>
+
+
+</div>)
+}
+
+
+
+/*
 import { useSession, signIn, signOut } from "next-auth/react"
 import { useEffect } from "react"
 
@@ -27,6 +45,8 @@ export default function HOME() {
   return (
     <div>
 
+<p className="bg-sky-300 pb-2.5 pt-5" >this is MAIN NEXT.JS page </p>
+
       <Link href={'/vdo'}>
         <button className="bg-pink-900 hover:bg-amber-50">go to vdo</button>
       </Link>
@@ -46,3 +66,4 @@ export default function HOME() {
     </div>
   )
 }
+*/

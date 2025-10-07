@@ -8,14 +8,15 @@ datasource db {
 }
 
 model AllInstaUser {
-  id        String    @id @default(uuid())
-  createdAt DateTime  @default(now())
-  emailId   String? 
-  image     String? 
-  token     String? 
+  id        String     @id @default(uuid())
+  createdAt DateTime   @default(now())
   userName  String
+  emailId   String?
+  image     String?
+  token     String?
   allImgs   AllImgs[]
   allMsgs   AllMsgs[]
+  allPolls  AllPolls[]
   allPosts  AllPost[]
 }
 
@@ -45,4 +46,24 @@ model AllImgs {
   userId    String
   publicUrl String
   user      AllInstaUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AllPolls {
+  id        String       @id @default(uuid())
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  userId    String
+  question  String
+  user      AllInstaUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  options   Options[]
+}
+
+model Options {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  pollsId     String
+  optionsName String
+  like        Int
+  poll        AllPolls @relation(fields: [pollsId], references: [id], onDelete: Cascade)
 }
