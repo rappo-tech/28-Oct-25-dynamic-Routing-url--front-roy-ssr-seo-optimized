@@ -1,7 +1,5 @@
-always use new Map() strcture  rather than array and object with  Record
+webrtc  stimulation of sdp and iceCandidate with Math.random()
 
-can check with multiple  browsers 
+fontendCode:-app/ptotect2/vdoCall/page.tsx
 
-frontend client  :- /protect2/vdoCall/page.tsx 
-websocket server :- websocket.ts  
-
+backendCode:-websocket.ts ( psudo implementiation of webrtc all code same just change sdp and ice-candidate type  with  math.Random() )
