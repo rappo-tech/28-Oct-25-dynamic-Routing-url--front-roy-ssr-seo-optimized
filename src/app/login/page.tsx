@@ -36,8 +36,8 @@ export default function HOME() {
       </Link>
 
 
-  <Link href={'/protect2/vdoCall'}>
-        <button className="bg-teal-600 hover:bg-teal-500">go to websocket app  </button>
+  <Link href={'/front/getUsers'}>
+        <button className="bg-teal-600 hover:bg-teal-500">get users buy useQuery </button>
       </Link>
 
 

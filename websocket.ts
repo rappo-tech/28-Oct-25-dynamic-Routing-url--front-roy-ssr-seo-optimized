@@ -1,132 +1,148 @@
 import { WebSocketServer,WebSocket } from "ws";
-import http from 'http'
+import  http from  'http'
 
-type EventType=|'join'|'offer'|'answer'|"ice-candidate"
+type EventType=|'join'|'offer'|"answer"|'ice-candidate'
 
-interface IncomingSocketType{
+
+interface IncomingMsgType{
 type:EventType|string, 
 peers?:string[], 
-roomId?:string, 
 clientId?:string, 
+roomId?:string, 
 to?:string, 
 sdp?:string|Record<string,unknown>, 
 candidate?:string|Record<string,unknown>, 
-[key: string]: unknown
+[key:string]:unknown
 }
 
-interface socketType extends WebSocket{
-clientId:string;
-roomId:string;
-lastMsgTimeStamp?:number[]// Date.now() to 1000ms only have 
+interface SocketType extends WebSocket{
+clientId:string, 
+roomId:string, 
+timeArr:number[]
 }
 
-const  server= http.createServer()
-const  wss=new WebSocketServer({server})
-const  AllRooms: Map<string,Map<string,WebSocket>>  =new Map()
+const server= http.createServer()
+const wss= new WebSocketServer({server})
+const AllRooms :Map<string,Map<string,WebSocket>> = new Map()
+const WITHIN_TIME=1000; 
+const MAX_MSGS=30
+const PORT= Number(process.env.PORT)
 
-//within 1000ms only 30 request|| each 1 second only take 30msg max 
-const WITHIN_TIME_LIMIT=1000; 
-const MAX_REQ=30
-
-//rate limit 
-const  allowRateLimit=(ws:socketType):boolean=>{
+//if in 1 sec=30 msg is coming then good if more then; ddos happeing 
+const legitUser=(socket:SocketType):boolean=>{
 const now=Date.now()
-
-if(!ws.lastMsgTimeStamp) ws.lastMsgTimeStamp=[]
-
-//first check point 
-ws.lastMsgTimeStamp=ws.lastMsgTimeStamp.filter((t)=>
-now-t<WITHIN_TIME_LIMIT
-//1700-1200=500<100 then false filter out that 
-)
-console.log(`filterd array :- ${ws.lastMsgTimeStamp}`)
-
-//second check point if it passes then add that  to arr || return false 
-if(ws.lastMsgTimeStamp.length>MAX_REQ)
-return  false    
-
-//third check point 
-ws.lastMsgTimeStamp.push(now) 
-console.log('pushed  into the timestamp array  ')
-return true;
+if(!socket.timeArr)socket.timeArr=[]
+//filter out the array within times 
+socket.timeArr=socket.timeArr.filter((times)=>
+now-times<WITHIN_TIME)
+//cehck if arr.length is under max_msg if not then block user
+if(socket.timeArr.length>MAX_MSGS) return false 
+//if both contion met the push the now in times array 
+socket.timeArr.push(now)
+return true 
 }
 
-wss.on('connection',(socket:socketType)=>{
 
-socket.on('message',(inomcingSocketMsg:string)=>{
-if(!allowRateLimit(socket)){
-socket.send(JSON.stringify({type:"error",msg:"exceeded rate limit "}))
-}
-const parsedIncomingSocketMsg :IncomingSocketType = JSON.parse(inomcingSocketMsg)
-if(parsedIncomingSocketMsg.type==='join'){
-const {roomId,clientId}=parsedIncomingSocketMsg
-console.log(parsedIncomingSocketMsg)
-if(!roomId || !clientId){
-socket.send(JSON.stringify({type:"error", msg:"eithier roomId or clientId is not aviable "}))
+
+wss.on('connection',(socket:SocketType)=>{
+
+socket.on('message',(incomingSocketMsg:string)=>{
+if(!legitUser(socket)){
+socket.send(JSON.stringify({type:"error",msg:"ddos  "}))
 return 
 }
-socket.roomId=roomId
+const parsedIncomingMsg :IncomingMsgType =JSON.parse(incomingSocketMsg)
+if(parsedIncomingMsg.type==='join'){
+const {clientId,roomId}=parsedIncomingMsg
+if(!clientId || !roomId){
+return 
+}
 socket.clientId=clientId
-if(!AllRooms.has(roomId))AllRooms.set(roomId,new Map())
-const findRoom=AllRooms.get(roomId)!
+socket.roomId=roomId
 
-socket.send(JSON.stringify({type:"existing-peers",peers:Array.from(findRoom.keys())}))
-console.log('existing peers',Array.from(findRoom.keys()))
+if(!AllRooms.has(roomId))AllRooms.set(roomId, new Map())
+const findRoom=AllRooms.get(roomId)
+
+if(!findRoom){
+  socket.send(JSON.stringify({type:"error",msg:"room not found"}))
+  return
+}
+
+socket.send(JSON.stringify({type:'existing-peers',peers:Array.from(findRoom.keys())}))
+console.log(`exisiting peers :- ${Array.from(findRoom.keys())}`)
 
 findRoom.forEach((wss)=>{
 if(wss.readyState===WebSocket.OPEN){
-wss.send(JSON.stringify({type:"new-peer",msg:`this user ${clientId} has been added to new peer `}))
-console.log('new peer is added ')
+wss.send(JSON.stringify({type:"new-peer",msg:` this new peer has joind ${clientId}`}))
+console.log(`this new user ${clientId} has joined the room `)
 }
 })
 
 findRoom.set(clientId,socket)
-}else if(parsedIncomingSocketMsg.type==='offer'|| parsedIncomingSocketMsg.type==='answer'||parsedIncomingSocketMsg.type==='ice-candidate'){
-const {to}=parsedIncomingSocketMsg
+console.log(`this user ${clientId} has joined the room ${roomId}`)
+}else if(parsedIncomingMsg.type==='ice-candidate'||parsedIncomingMsg.type==='answer'||parsedIncomingMsg.type==='offer'){
+const {to}=parsedIncomingMsg
 const {roomId}=socket
-
 if(!to || !roomId){
-socket.send(JSON.stringify({type:"error",msg:"no roomId || traget user find"}))
 return 
 }
-
-const findRoom=AllRooms.get(roomId)!
+const findRoom=AllRooms.get(roomId)
+if(!findRoom){
+  return
+}
 const findUser=findRoom.get(to)
 
-if(findUser && findUser.readyState===WebSocket.OPEN){
-findUser.send(JSON.stringify({...parsedIncomingSocketMsg,from:socket.clientId}))
-console.log(`msg gone `)
+if(findUser && findUser.readyState===WebSocket.OPEN ){
+findUser.send(JSON.stringify({...parsedIncomingMsg,from:socket.clientId}))
+console.log('offer||answer||canidate msg gone ')
 }
 
 
 }
 
 
-    
+
+
+
+
 })
+
 
 socket.on('close',()=>{
 const {clientId,roomId}=socket
 if(!clientId || !roomId){
 return 
 }
-const  findRoom= AllRooms.get(roomId)!
-findRoom.delete(clientId)
-console.log(`client gone from the room `)
+const findRoom=AllRooms.get(roomId)
+if(!findRoom){
+return 
+}
+if(findRoom)findRoom.delete(clientId)
+  findRoom.forEach((peer)=>{
+      if(peer.readyState===WebSocket.OPEN){
+        peer.send(JSON.stringify({type:"peer-left",clientId}))
+      }
+    })
 if(findRoom.size===0)AllRooms.delete(roomId)
+console.log(`this user ${clientId} has leave the room `)
+})
+
+socket.on('error',(err)=>{
+  console.error(`Socket error for ${socket.clientId}:`,err)
 })
 
 })
 
-process.on('SIGINT',()=>{
+const shutdown=()=>{
 wss.close(()=>{
-console.log('websocket closed ')
 server.close(()=>{
-console.log('http server closed ')
 process.exit(0)
 })
 })
-})
+console.log('wss and http server closed ')
+}
 
+process.on('SIGINT',shutdown)
+process.on('SIGTERM',shutdown)
 
-server.listen(5001,()=>console.log('websocket server strated at port 5001'))
+server.listen(PORT,()=>console.log(`websocket server live at port:${PORT}`))

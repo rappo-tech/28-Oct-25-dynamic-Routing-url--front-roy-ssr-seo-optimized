@@ -1,5 +1,3 @@
-//write websocket.ts 3 times 
-//write vdocall.tsx 1 times  with real sdp and iceCandidate type 
-//go to  sleep ---- 
-
-
+//backend.ts 
+//getUser.tsx===1.
+//createUser.tsx===just  click and then go to get users you should  see the backend code call loging 
