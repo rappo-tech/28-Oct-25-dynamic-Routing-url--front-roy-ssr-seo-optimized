@@ -37,7 +37,7 @@ export default function HOME() {
 
 
   <Link href={'/front/getUsers'}>
-        <button className="bg-teal-600 hover:bg-teal-500">get users buy useQuery </button>
+        <button className="bg-teal-600 hover:bg-teal-500">get users  </button>
       </Link>
 
 
