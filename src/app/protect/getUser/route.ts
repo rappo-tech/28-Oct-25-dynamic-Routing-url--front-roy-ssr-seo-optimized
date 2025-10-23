@@ -1,38 +1,54 @@
-import { NextRequest, NextResponse } from "next/server";
-//if req  has 'none' then send allUsers
-//if req has  'name'  then send only name,pin,city 
-export async function POST(req:NextRequest) {
-try{
-const allUsers= [
-{name:"u1",pin:8939483,city:"la",msg:'you send empty name'}, 
-{name:"u2",pin:762732,city:"europe", msg:'you send empty name' },
-{name:"u3",pin:999234,city:"asia",msg:'you send empty name' },
-{name:"u1",pin:8939483,city:"singapore",msg:'you send empty name' },
-  ]
-const body=await req.json()
-console.log(body)
-if(!body){
-return NextResponse.json({error:"error "},{status:404})
-}  
-const {name}=body
+import { NextResponse } from "next/server";
+import prisma from "../../../../lib/prisma";
+import { getCache,setCache } from "../../../../lib/redisCache";
 
-const findName=(name:string)=>{
-const findUser=allUsers.find((users)=>name===users.name)
-if(!findUser){
-return 
-}
-const arr=  [{name:findUser.name,pin:findUser.pin,city:findUser.city}]
-return arr
-} 
 
-if(name===''){
-return NextResponse.json(allUsers,{status:201})
-}else{
-console.log(findName(name))
-return NextResponse.json(findName(name),{status:201})
+export async function GET() {
+  console.log('get req came');
+  
+  const cacheKey = 'allInstaUsers';
+  
+  try {
+    const cached = await getCache(cacheKey);
+    if (cached) {
+      console.log('✅ Data from REDIS cache');
+      return NextResponse.json({ 
+        data: cached, 
+        source: 'redis' // 🟢 Shows source
+      }, { status: 201 });
+    }
+    
+    console.log('❌ Cache miss - fetching from DB');
+    const allUser = await prisma.allInstaUser.findMany();
+    
+    await setCache(cacheKey, allUser, 3600);
+    
+    console.log(`💾 Data saved to Redis, prisma data:${allUser}`);
+    return NextResponse.json({ 
+      data: allUser, 
+      source: 'database' // 🟢 Shows source
+    }, { status: 201 });
+    
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json('Server error', { status: 500 });
+  }
 }
+/*
 
-}catch{
-return NextResponse.json('try catch error ',{status:500})
+import { NextResponse } from "next/server";
+import prisma from "../../../../lib/prisma";
+
+export async function GET() {
+console.log(`req came`)
+  try{
+const allInstaUser=await prisma.allInstaUser.findMany()
+console.log(allInstaUser)
+return NextResponse.json(allInstaUser,{status:201})
+  }catch{
+  return NextResponse.json('try catch error ',{status:500})
+  }
 }
-}
+*/
+
+
