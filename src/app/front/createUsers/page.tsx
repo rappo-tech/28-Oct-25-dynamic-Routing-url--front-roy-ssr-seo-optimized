@@ -1,56 +1,58 @@
 'use client'
 
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import axios from 'axios'
 import { useState } from 'react'
 import Link from 'next/link'
 
-export default function SettingsPage() {
-  const [userName, setUserName] = useState('')
-  const queryClient = useQueryClient()
+export default function CreateUniqueUrl() {
+  const [channelName, setChannelName] = useState('')
+  const [url, setUrl] = useState('')
 
-  // Mutation — sends updated username to backend
-  const updateUserMutation = useMutation({
-    mutationFn: async (userName: string) => {
-      console.log('Sending username to backend...')
-      const res = await axios.post('/protect/createUser', {userName})
-      return res.data
-    },
-    onSuccess: () => {
-      console.log('✅ Backend updated, invalidating old cached data...')
-      queryClient.invalidateQueries({ queryKey: ['query1'] })
-    },
-  })
+  const baseUrl = 'http://localhost:3000/promo/'
 
-  const handleSubmit = () => {
-    if (!userName.trim()) return alert('Enter a username!')
-    updateUserMutation.mutate(userName)
-   alert('cache Invalidated ')
+  const generateUrl = () => {
+    try {
+      const genUrl = `${baseUrl}${channelName}`
+      setUrl(genUrl)
+      //save  that url with  influncer+channel Name+genrated url
+    } catch {
+      setUrl('err')
+    }
   }
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h2>Update User Profile</h2>
-
+    <div className="p-5">
       <input
         type="text"
-        placeholder="Enter new username"
-        value={userName}
-        onChange={(e) => setUserName(e.target.value)}
-        style={{ padding: '6px', marginRight: '10px' }}
+        placeholder="enter your channel name"
+        value={channelName}
+        onChange={(e) => setChannelName(e.target.value)}
+        className="border p-2"
       />
-      <button onClick={handleSubmit}>Update</button>
+      <button
+        onClick={generateUrl}
+        className="ml-2 bg-green-700 hover:bg-green-600 px-3 py-1 text-white rounded"
+      >
+        Generate
+      </button>
 
-      {updateUserMutation.isPending && <p>Updating...</p>}
-      {updateUserMutation.isSuccess && <p>✅ Username updated!</p>}
-      {updateUserMutation.isError && (
-        <p style={{ color: 'red' }}>❌ Failed to update</p>
+      {url && (
+        <>
+          <p className="mt-4 font-semibold">Your unique URL:</p>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline"
+          >
+            {url}
+          </a>
+        </>
       )}
 
-
 <Link href={'/front/getUsers'}>
-<button className='bg-amber-600 hover:bg-amber-500'>see usersArray </button>
+<button className='bg-red-600'>getUsers </button>
 </Link>
+
     </div>
   )
 }

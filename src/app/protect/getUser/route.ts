@@ -21,7 +21,7 @@ export async function GET() {
     console.log('❌ Cache miss - fetching from DB');
     const allUser = await prisma.allInstaUser.findMany();
     
-    await setCache(cacheKey, allUser, 3600);
+    await setCache(cacheKey, allUser, 300);
     
     console.log(`💾 Data saved to Redis, prisma data:${allUser}`);
     return NextResponse.json({ 

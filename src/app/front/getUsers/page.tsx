@@ -15,6 +15,7 @@ export default function GETUSER() {
   const [active, setActive] = useState<string>('')
   const router = useRouter() // ✅
   const [userName,setUserName]=useState<string>('')
+  const baseUrl = 'http://localhost:3000/getUsers/'
 
   // Fetch all users
   const getArr = async () => {
@@ -33,7 +34,7 @@ export default function GETUSER() {
 // When clicking a user name
   const handleUserClick = (name: string) => {
     setActive(name)
-    router.push(`/front/getUsers/${name}`) // ✅ dynamic URL change
+    router.push(`${baseUrl}`+`${name}`)// ✅ dynamic URL change
 }
 
  const  claerArr= async () => {
@@ -49,7 +50,7 @@ setArr([])
 }
 const createUser=async()=>{
 try{
-const response=await axios.post('/protect/createUser',{userName},{headers:{'Authorization':"application/json"}})
+const response=await axios.post('/protect/createUser',{userName},{headers:{'Content-Type':"application/json"}})
 if(response.status===201){
 setError(response.data)
 getArr()

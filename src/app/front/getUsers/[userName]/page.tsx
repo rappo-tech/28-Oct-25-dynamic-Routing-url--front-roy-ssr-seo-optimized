@@ -20,7 +20,7 @@ export default function UserDetail() {
   useEffect(() => {
     const getUserDetail = async () => {
       try {
-        const response = await axios.post('/protect/getUser', { name: userName }, { headers: { Authorization: 'application/json' } })
+        const response = await axios.post('/protect/getUser', { name: userName }, { headers: { "Content-Type": 'application/json' } })
         if (response.status === 201) {
           setUser(response.data)
         }
