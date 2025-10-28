@@ -31,12 +31,12 @@ export default function HOME() {
 
 <p className="bg-sky-300 pb-2.5 pt-5" >this is LOGIN page </p>
 
-      <Link href={'/vdo'}>
+      <Link href={'/front/vdoCall2'}>
         <button className="bg-pink-900 hover:bg-amber-50">go to vdo</button>
       </Link>
 
 
-  <Link href={'/front/createUsers'}>
+  <Link href={'/front/getAllUsers'}>
         <button className="bg-teal-600 hover:bg-teal-500">genrate urls  </button>
       </Link>
 

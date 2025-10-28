@@ -1,17 +1,17 @@
 import {create} from 'zustand'
 
 export type storeType={
-questionName:string, 
-setQuestionName:(questionName:string)=>void, 
+selectedUser:string, 
+setSelectedUser:(selectedUser:string)=>void, 
 status:string, 
 setStatus:(status:string)=>void, 
 optionsName:string, 
 setOptionsName:(optionsName:string)=>void
 }
 
-export const store =create<storeType>((set)=>({
-questionName:'', 
-setQuestionName:(questionName:string)=>set({questionName}), 
+export const useStore =create<storeType>((set)=>({
+selectedUser:'', 
+setSelectedUser:(selectedUser:string)=>set({selectedUser}), 
 status:"", 
 setStatus:(status:string)=>set({status}), 
 optionsName:'', 

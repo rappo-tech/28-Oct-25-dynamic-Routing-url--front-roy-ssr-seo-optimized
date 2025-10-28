@@ -36,6 +36,7 @@ model AllPost {
   updatedAt DateTime     @updatedAt
   userId    String
   post      String
+  imgUrl    String?
   user      AllInstaUser @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
