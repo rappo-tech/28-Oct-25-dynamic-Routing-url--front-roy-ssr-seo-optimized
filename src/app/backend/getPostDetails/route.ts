@@ -20,7 +20,7 @@ where:{userId:findUser.id,post:postName}
 if(!findPost){
 return 
 }
-console.log(`findPost obj :- ${findPost}`)
+console.log(`findPost obj :- id:${findPost.id},post:${findPost.post},imgurl:${findPost.imgUrl},time:${findPost.createdAt}`)
 return NextResponse.json({id:findPost.id,post:findPost.post,imgUrl:findPost.imgUrl,time:findPost.createdAt},{status:201})
     }catch{
 return NextResponse.json('try catch err',{status:500})

@@ -1,42 +1,47 @@
 /*
-
-getUsers/page.tsx  ====>1st event
-http://localhost:3000/getUsers
-[userName]/dataFetch.tsx/page.tsx  ====>2nd event
-http://localhost:3000/front/roy
-[userName]/post/[postName]/dataFetch.tsx/page.tsx/dataFetch.tsx/page.tsx  ====>3rd event
-http://localhost:3000/front/roy/post/postIdRoyPost3
+page.tsx===>page.tsx==>clientSection.tsx==>page.tsx===>clientSection.tsx 
 
 
 
 
 
+1.practice 3 times with dynamic url routing only for getOtherAllVideo.tsx & 
+getOtherOneVideo  with actual sql db 
 
-make the app with real db and strat practing 
+2.dynamic  url routing + query static url routing
+// Product page: /product/vivo-832273
+<button onClick={() => router.push(`/checkout?itemId=832273`)}>
+  Buy Now
+</button>
+// Checkout page: /checkout?itemId=832273
+'use client'
+export default function Checkout({searchParams}) {
+  const itemId = searchParams.itemId  // "832273"
+  
+---------------------------------------------------------------------------------------------------
+yt clone:- 
 
-1.localhost:3000/home/instaUserName/posts/id:90108834
-2.localhost:3000/home/instaUserName/allMsgs/id:98430949
+1.createOwnUserprofile=/checkout?itemId=832273
+2.getGlobalFeed=/checkout?itemId=832273
+4.edit OwnProfile=/checkout?itemId=832273
+5.deleteOwnProfile=/checkout?itemId=832273
+6.createOwnChannel=/checkout?itemId=832273
+7.uploadOwnVdo=/checkout?itemId=832273
+8.deleteOwnVdo=/checkout?itemId=832273
+12.subscribeToOtherChannel=/checkout?itemId=832273
+13.likeToOtherVdo=/checkout?itemId=832273
+14.commentOnOthersVdo=/checkout?itemId=832273
 
-1.getAllInstaUsers.tsx,2.getAllInstaUsers.ts 
-3.createPost.tsx,4.createPost.ts
-
-5.[getAllPostOfOneUser.tsx],6.getAllPOstOfOneUser.ts
-
-7.[detailOfSinglePost.tsx],8.detailOfSinglePost.ts
+3.srchOthersVdo===>yt/results?search_query=zootopia+
+9.getOtherAllVdo=>[userName]/page.tsx/clientSection.tsx
+10.getOtherSingleVdo=>[userName]/page.tsx/clientSection.tsx/[vdoId]/page.tsx/clientSection.tsx 
+11.shareVdoLinkOfOther`sOneVdo=>[userName]/page.tsx/clientSection.tsx/[vdoId]/page.tsx/clientSection.tsx 
 
 
 
-1.onBoardInfluncer.tsx=>fill the form upload to backend api 
 
-2.onBoardInfluncer.ts=>
 
-3.veiwerClicks.tsx==>(a).redirect  to (mainWebsite.tsx);
-(b).send the influncerName,ip,browser info. to  veiwerClicks.ts
 
-4.veiwerClicks.ts===>fetch the influncerName,ip,broswer info. 
-and find the infulncerName from db  and  save ip,browser info.in table 
-
-5.mainWebsite.tsx
 
 
 

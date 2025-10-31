@@ -36,7 +36,7 @@ router.push(`/front/createPost/${userName}`)
 }
 
 //to view users allPOsts with imgUrl
-const  handleClick2=()=>{
+const  handleClick2=(userName:string)=>{
 router.push(`/front/${userName}`)
 }
 
@@ -54,7 +54,7 @@ return(<div>
 arr.map((elemnt,index)=>{
 return <div key={index}>
 <button className="bg-blue-500" onClick={()=>setUserName(elemnt.userName)}>{elemnt.userName}</button>
-<button className="bg-teal-600" onClick={handleClick2}  >veiw all his post</button>
+<button className="bg-teal-600" onClick={()=>handleClick2(elemnt.userName)}>veiw all his post</button>
 <button onClick={handleClick} className="bg-green-600">creeate Post </button>
 <div>{
 elemnt.allPosts.map((elemnt2,index2)=>{
