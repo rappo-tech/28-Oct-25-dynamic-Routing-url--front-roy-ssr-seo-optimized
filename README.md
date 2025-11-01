@@ -1,4 +1,4 @@
-Dynamic Url Routing vs static Url Routing 
+Dynamic Url Routing vs  query static Url Routing 
 ---------------------------------------------------------------
 
 before  Dynamic Url Routing
